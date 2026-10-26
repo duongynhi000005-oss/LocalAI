@@ -1,6 +1,8 @@
 package system
 
 import (
+	"path/filepath"
+
 	"github.com/mudler/LocalAI/pkg/xsysinfo"
 	"github.com/mudler/xlog"
 )
@@ -68,6 +70,21 @@ func WithStagingPath(path string) SystemStateOptions {
 	return func(s *SystemState) {
 		s.StagingPath = path
 	}
+}
+
+// BackendStagingPath returns the directory for in-flight backend downloads:
+// the explicit StagingPath when configured, otherwise a "downloading"
+// subdirectory inside BackendsPath so downloads stage on the same writable
+// volume as installed backends without creating a root-level //downloading
+// directory when basepath is "/".
+func (s *SystemState) BackendStagingPath() string {
+	if s.StagingPath != "" {
+		return filepath.Clean(s.StagingPath)
+	}
+	if s.Backend.BackendsPath != "" {
+		return filepath.Join(s.Backend.BackendsPath, "downloading")
+	}
+	return ""
 }
 
 func WithModelPath(path string) SystemStateOptions {

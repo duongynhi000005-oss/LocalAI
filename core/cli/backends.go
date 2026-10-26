@@ -20,6 +20,7 @@ type BackendsCMDFlags struct {
 	BackendGalleries        string `env:"LOCALAI_BACKEND_GALLERIES,BACKEND_GALLERIES" help:"JSON list of backend galleries" group:"backends" default:"${backends}"`
 	BackendsPath            string `env:"LOCALAI_BACKENDS_PATH,BACKENDS_PATH" type:"path" default:"${basepath}/backends" help:"Path containing backends used for inferencing" group:"storage"`
 	BackendsSystemPath      string `env:"LOCALAI_BACKENDS_SYSTEM_PATH,BACKEND_SYSTEM_PATH" type:"path" default:"/var/lib/local-ai/backends" help:"Path containing system backends used for inferencing" group:"backends"`
+	DownloadStagingPath     string `env:"LOCALAI_DOWNLOAD_STAGING_PATH,DOWNLOAD_STAGING_PATH" type:"path" help:"Path where in-flight downloads are staged before extraction (defaults to <backends-path>/downloading)" group:"storage"`
 	RequireBackendIntegrity bool   `env:"LOCALAI_REQUIRE_BACKEND_INTEGRITY,REQUIRE_BACKEND_INTEGRITY" help:"If true, reject backend installs without a configured signature verification policy (OCI URIs) or SHA256 (tarball/HTTP URIs)." group:"hardening" default:"false"`
 }
 
@@ -108,6 +109,7 @@ func (bi *BackendsInstall) Run(ctx *cliContext.Context) error {
 	systemState, err := system.GetSystemState(
 		system.WithBackendSystemPath(bi.BackendsSystemPath),
 		system.WithBackendPath(bi.BackendsPath),
+		system.WithStagingPath(bi.DownloadStagingPath),
 		system.WithRequireBackendIntegrity(bi.RequireBackendIntegrity),
 	)
 	if err != nil {
@@ -146,6 +148,7 @@ func (bu *BackendsUpgrade) Run(ctx *cliContext.Context) error {
 	systemState, err := system.GetSystemState(
 		system.WithBackendSystemPath(bu.BackendsSystemPath),
 		system.WithBackendPath(bu.BackendsPath),
+		system.WithStagingPath(bu.DownloadStagingPath),
 		system.WithRequireBackendIntegrity(bu.RequireBackendIntegrity),
 	)
 	if err != nil {

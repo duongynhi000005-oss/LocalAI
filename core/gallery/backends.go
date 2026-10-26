@@ -382,7 +382,7 @@ func InstallBackend(ctx context.Context, systemState *system.SystemState, modelL
 	if optsErr != nil {
 		return fmt.Errorf("backend %q: %w", config.Name, optsErr)
 	}
-	downloadOpts = append(downloadOpts, downloader.WithStagingDir(systemState.StagingPath))
+	downloadOpts = append(downloadOpts, downloader.WithStagingDir(systemState.BackendStagingPath()))
 	if config.MaxBytes > 0 {
 		downloadOpts = append(downloadOpts, downloader.WithMaxBytes(config.MaxBytes))
 	}

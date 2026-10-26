@@ -2,6 +2,7 @@ package system
 
 import (
 	"os"
+	"path/filepath"
 	"runtime"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -383,5 +384,27 @@ var _ = Describe("ServingFeaturePreferenceTokens", func() {
 		first := ServingFeaturePreferenceTokens()
 		first[0] = "clobbered"
 		Expect(ServingFeaturePreferenceTokens()[0]).To(Equal("dflash"))
+	})
+})
+
+var _ = Describe("BackendStagingPath", func() {
+	It("defaults to <BackendsPath>/downloading when StagingPath is unset", func() {
+		state, err := GetSystemState(WithBackendPath("/backends"))
+		Expect(err).ToNot(HaveOccurred())
+		Expect(state.BackendStagingPath()).To(Equal(filepath.Join("/backends", "downloading")))
+	})
+
+	It("prefers an explicit StagingPath override and cleans it", func() {
+		state, err := GetSystemState(
+			WithBackendPath("/backends"),
+			WithStagingPath("//custom//staging"),
+		)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(state.BackendStagingPath()).To(Equal(filepath.Clean("//custom//staging")))
+	})
+
+	It("returns empty string when neither StagingPath nor BackendsPath is set", func() {
+		state := &SystemState{}
+		Expect(state.BackendStagingPath()).To(BeEmpty())
 	})
 })
