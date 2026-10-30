@@ -163,6 +163,7 @@ func ResponsesEndpoint(cl *config.ModelConfigLoader, ml *model.ModelLoader, eval
 			Context:   input.Context,
 			Cancel:    input.Cancel,
 			Functions: funcs,
+			Metadata:  input.Metadata,
 		}
 
 		// Handle text_format -> response_format conversion

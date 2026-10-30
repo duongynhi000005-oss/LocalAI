@@ -768,6 +768,19 @@ func mergeOpenAIRequestAndModelConfig(config *config.ModelConfig, input *schema.
 		}
 	}
 
+	reasoningEffort := ""
+	if input.Reasoning != nil && input.Reasoning.Effort != "" {
+		reasoningEffort = input.Reasoning.Effort
+	} else if input.Metadata != nil && input.Metadata["reasoning_effort"] != "" {
+		reasoningEffort = input.Metadata["reasoning_effort"]
+	}
+	if reasoningEffort != "" {
+		config.ApplyReasoningEffort(reasoningEffort)
+	}
+	if len(input.Metadata) > 0 {
+		config.RequestMetadata = input.Metadata
+	}
+
 	if valid, err := config.Validate(); !valid {
 		// The base config validated at load time, so a post-merge failure
 		// can only come from request-supplied fields: surface it as a 400
